@@ -25,6 +25,7 @@ border:1px solid #ded9ce;box-shadow:0 5px 16px rgba(0,0,0,.65);pointer-events:no
 #couplePolaroid img{display:block;width:100%;height:auto}
 #musicControls{position:absolute;left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
 display:flex;gap:8px;z-index:5}
+#musicControls[hidden]{display:none}
 #musicControls button{border:1px solid rgba(255,255,255,.55);border-radius:999px;background:rgba(0,0,0,.8);color:#fff;
 font:8px/1 'Press Start 2P',monospace;padding:10px 12px;cursor:pointer}
 #musicControls button:active{transform:scale(.96)}
