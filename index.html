@@ -30,12 +30,14 @@ font:8px/1 'Press Start 2P',monospace;padding:10px 12px;cursor:pointer}
 #musicControls button:active{transform:scale(.96)}
 #musicStatus{position:absolute;z-index:5;left:0;right:0;bottom:calc(48px + env(safe-area-inset-bottom,0px));
 text-align:center;color:#fff;font:10px/1.4 Arial,sans-serif;text-shadow:0 1px 3px #000;pointer-events:none}
-#musicDialog{width:min(380px,calc(100vw - 36px));box-sizing:border-box;padding:20px;border:2px solid #f08bb4;
-border-radius:16px;background:#fff7fb;color:#48162d;text-align:center;box-shadow:0 12px 45px rgba(0,0,0,.7)}
-#musicDialog::backdrop{background:rgba(0,0,0,.84)}
-#musicDialog h2{margin:0 0 12px;color:#c52e6a;font:12px/1.5 'Press Start 2P',monospace}
-#ytMusic{display:block;width:min(320px,100%);height:200px;margin:0 auto 12px;border:0}
-#officialTrack{display:block;margin:0 0 14px;color:#a82058;font:13px Arial,sans-serif}
+#musicPanel{position:fixed;z-index:5;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));
+width:min(350px,calc(100vw - 24px));box-sizing:border-box;padding:12px;border:2px solid #f08bb4;
+border-radius:16px;background:#fff7fb;color:#48162d;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.65)}
+#musicPanel[hidden]{display:none}
+#musicPanel h2{margin:0 0 10px;color:#c52e6a;font:10px/1.5 'Press Start 2P',monospace}
+#ytMusic{display:block;width:100%;height:190px;margin:0 auto 10px;border:0}
+#musicPanelActions{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#officialTrack{color:#a82058;font:12px Arial,sans-serif}
 #stopMusic{border:0;border-radius:999px;background:#e83e7b;color:#fff;padding:10px 18px;font-weight:bold;cursor:pointer}
 #letterTrigger{position:absolute;z-index:6;right:12px;bottom:calc(54px + env(safe-area-inset-bottom,0px));
 width:92px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer}
@@ -78,13 +80,15 @@ color:#fff;padding:10px 16px;font-weight:bold;cursor:pointer}
 <p>Happy motmot tamtam! I know I may not always give you the things that you wanted and I have been inconsistent on some things. But I know one thing, Ill always find a way to suprise you!! I know we cant celebrate monthsary that much because of our sched but its okay because we get to see eachother at the end of the day and thats a gift alone na! I love youu so muchh babyy and Happy MOTMOTTTT OPAOOO!! See you laterr</p>
 <button id="closeLetter" type="button">Close</button>
 </dialog>
-<dialog id="musicDialog" aria-labelledby="musicHeading">
+<section id="musicPanel" aria-labelledby="musicHeading" hidden>
 <h2 id="musicHeading">SEVENTEEN - Same Dream, Same Mind, Same Night</h2>
 <iframe id="ytMusic" title="Official YouTube music player" allow="autoplay; encrypted-media; picture-in-picture"
 referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<div id="musicPanelActions">
 <a id="officialTrack" href="https://www.youtube.com/watch?v=Nm1-91zeYzI" target="_blank" rel="noopener noreferrer">Open official track on YouTube</a>
 <button id="stopMusic" type="button">STOP</button>
-</dialog>
+</div>
+</section>
 <div id="musicControls" aria-label="Music controls">
 <button id="startMusic" type="button">START MUSIC</button>
 </div>
@@ -255,20 +259,22 @@ document.getElementById('closeLetter').addEventListener('click',()=>letterDialog
 letterDialog.addEventListener('click',event=>{
  if(event.target===letterDialog)letterDialog.close();
 });
-const musicDialog=document.getElementById('musicDialog');
+const musicPanel=document.getElementById('musicPanel');
 const ytMusic=document.getElementById('ytMusic');
+const musicControls=document.getElementById('musicControls');
 document.getElementById('startMusic').addEventListener('click',()=>{
- musicDialog.showModal();
+ musicPanel.hidden=false;
+ musicControls.hidden=true;
+ musicStatus.hidden=true;
  ytMusic.src='https://www.youtube-nocookie.com/embed/Nm1-91zeYzI?autoplay=1&controls=1&loop=1&playlist=Nm1-91zeYzI&playsinline=1&rel=0';
- musicStatus.textContent='Use the YouTube controls to pause or adjust volume.';
+ musicStatus.textContent='Music is playing. Open your letter anytime; use STOP to end playback.';
 });
-document.getElementById('stopMusic').addEventListener('click',()=>musicDialog.close());
-musicDialog.addEventListener('close',()=>{
+document.getElementById('stopMusic').addEventListener('click',()=>{
  ytMusic.removeAttribute('src');
+ musicPanel.hidden=true;
+ musicControls.hidden=false;
+ musicStatus.hidden=false;
  musicStatus.textContent='Music stopped.';
-});
-musicDialog.addEventListener('click',event=>{
- if(event.target===musicDialog)musicDialog.close();
 });
 </script>
 </body></html>

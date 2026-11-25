@@ -12,4 +12,4 @@ In the repository settings, enable GitHub Pages and deploy from the `main` branc
 
 ## Music
 
-The page uses the official YouTube embed for the selected song. Press **START MUSIC** to open the player; browser autoplay restrictions require a user gesture. Press **STOP** to close the player.
+The page uses the official YouTube embed for the selected song. Press **START MUSIC** to open the floating player; browser autoplay restrictions require a user gesture. Playback continues while the letter is open. Press **STOP** to end playback.
