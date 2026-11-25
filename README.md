@@ -10,6 +10,6 @@ Open `index.html` in a browser or serve the repository root with a local web ser
 
 In the repository settings, enable GitHub Pages and deploy from the `main` branch root.
 
-## Optional music
+## Music
 
-The supplied commercial MP3 is not included. To enable music, add an audio file you have the right to publish as `music.mp3` in the repository root. The page attempts autoplay; browser autoplay restrictions may require pressing **START**.
+The page uses the official YouTube embed for the selected song. Press **START MUSIC** to open the player; browser autoplay restrictions require a user gesture. Press **STOP** to close the player.

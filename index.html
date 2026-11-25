@@ -30,6 +30,13 @@ font:8px/1 'Press Start 2P',monospace;padding:10px 12px;cursor:pointer}
 #musicControls button:active{transform:scale(.96)}
 #musicStatus{position:absolute;z-index:5;left:0;right:0;bottom:calc(48px + env(safe-area-inset-bottom,0px));
 text-align:center;color:#fff;font:10px/1.4 Arial,sans-serif;text-shadow:0 1px 3px #000;pointer-events:none}
+#musicDialog{width:min(380px,calc(100vw - 36px));box-sizing:border-box;padding:20px;border:2px solid #f08bb4;
+border-radius:16px;background:#fff7fb;color:#48162d;text-align:center;box-shadow:0 12px 45px rgba(0,0,0,.7)}
+#musicDialog::backdrop{background:rgba(0,0,0,.84)}
+#musicDialog h2{margin:0 0 12px;color:#c52e6a;font:12px/1.5 'Press Start 2P',monospace}
+#ytMusic{display:block;width:min(320px,100%);height:200px;margin:0 auto 12px;border:0}
+#officialTrack{display:block;margin:0 0 14px;color:#a82058;font:13px Arial,sans-serif}
+#stopMusic{border:0;border-radius:999px;background:#e83e7b;color:#fff;padding:10px 18px;font-weight:bold;cursor:pointer}
 #letterTrigger{position:absolute;z-index:6;right:12px;bottom:calc(54px + env(safe-area-inset-bottom,0px));
 width:92px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer}
 .envelope{position:relative;display:block;width:74px;height:48px;margin:0 auto 5px;
@@ -71,12 +78,17 @@ color:#fff;padding:10px 16px;font-weight:bold;cursor:pointer}
 <p>Happy motmot tamtam! I know I may not always give you the things that you wanted and I have been inconsistent on some things. But I know one thing, Ill always find a way to suprise you!! I know we cant celebrate monthsary that much because of our sched but its okay because we get to see eachother at the end of the day and thats a gift alone na! I love youu so muchh babyy and Happy MOTMOTTTT OPAOOO!! See you laterr</p>
 <button id="closeLetter" type="button">Close</button>
 </dialog>
-<audio id="bgMusic" src="music.mp3" loop preload="auto" autoplay></audio>
+<dialog id="musicDialog" aria-labelledby="musicHeading">
+<h2 id="musicHeading">SEVENTEEN - Same Dream, Same Mind, Same Night</h2>
+<iframe id="ytMusic" title="Official YouTube music player" allow="autoplay; encrypted-media; picture-in-picture"
+referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<a id="officialTrack" href="https://www.youtube.com/watch?v=Nm1-91zeYzI" target="_blank" rel="noopener noreferrer">Open official track on YouTube</a>
+<button id="stopMusic" type="button">STOP</button>
+</dialog>
 <div id="musicControls" aria-label="Music controls">
-<button id="startMusic" type="button" disabled>START</button>
-<button id="stopMusic" type="button" disabled>STOP</button>
+<button id="startMusic" type="button">START MUSIC</button>
 </div>
-<div id="musicStatus" role="status" aria-live="polite">Add a licensed music.mp3 file to enable music.</div>
+<div id="musicStatus" role="status" aria-live="polite">Tap START MUSIC to listen.</div>
 <script>
 const W=180,H=280,G=262,CX=54;
 const cv=document.getElementById('c'),x=cv.getContext('2d');cv.width=W;cv.height=H;x.imageSmoothingEnabled=false;
@@ -236,47 +248,27 @@ function frame(ms){
 requestAnimationFrame(frame);
 </script>
 <script>
-const bgMusic=document.getElementById('bgMusic');
-bgMusic.volume=0.35;
 const musicStatus=document.getElementById('musicStatus');
-const startMusic=document.getElementById('startMusic');
-const stopMusic=document.getElementById('stopMusic');
-let hasMusic=false;
-bgMusic.addEventListener('canplay',()=>{
- hasMusic=true;
- startMusic.disabled=false;
- stopMusic.disabled=false;
- musicStatus.textContent='';
-});
-bgMusic.addEventListener('error',()=>{
- hasMusic=false;
- startMusic.disabled=true;
- stopMusic.disabled=true;
- musicStatus.textContent='Add a licensed music.mp3 file to enable music.';
-});
 const letterDialog=document.getElementById('letterDialog');
 document.getElementById('letterTrigger').addEventListener('click',()=>letterDialog.showModal());
 document.getElementById('closeLetter').addEventListener('click',()=>letterDialog.close());
 letterDialog.addEventListener('click',event=>{
  if(event.target===letterDialog)letterDialog.close();
 });
-bgMusic.play().then(()=>{
- musicStatus.textContent='';
-}).catch(error=>{
- musicStatus.textContent=hasMusic&&error.name==='NotAllowedError'
-  ?'Autoplay was blocked by the browser. Press START to play.'
-  :hasMusic?'Music could not start. Press START to try again.'
-  :'Add a licensed music.mp3 file to enable music.';
+const musicDialog=document.getElementById('musicDialog');
+const ytMusic=document.getElementById('ytMusic');
+document.getElementById('startMusic').addEventListener('click',()=>{
+ musicDialog.showModal();
+ ytMusic.src='https://www.youtube-nocookie.com/embed/Nm1-91zeYzI?autoplay=1&controls=1&loop=1&playlist=Nm1-91zeYzI&playsinline=1&rel=0';
+ musicStatus.textContent='Use the YouTube controls to pause or adjust volume.';
 });
-startMusic.addEventListener('click',()=>{
- bgMusic.play().then(()=>{musicStatus.textContent='';}).catch(error=>{
-  musicStatus.textContent='Music could not start: '+error.message;
- });
+document.getElementById('stopMusic').addEventListener('click',()=>musicDialog.close());
+musicDialog.addEventListener('close',()=>{
+ ytMusic.removeAttribute('src');
+ musicStatus.textContent='Music stopped.';
 });
-stopMusic.addEventListener('click',()=>{
- bgMusic.pause();
- bgMusic.currentTime=0;
- musicStatus.textContent='Music stopped';
+musicDialog.addEventListener('click',event=>{
+ if(event.target===musicDialog)musicDialog.close();
 });
 </script>
 </body></html>
