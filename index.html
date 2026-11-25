@@ -1,0 +1,282 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Happy Motmot, paopaoooo</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000;--fg:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--fg:#fff}}
+:root[data-theme="dark"]{--bg:#000;--fg:#fff}
+html,body{height:100%;margin:0;background:var(--bg)}
+body{display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+canvas{position:relative;z-index:1;image-rendering:pixelated;display:block}
+#photoStrip{position:absolute;z-index:0;top:38%;left:50%;transform:translateX(-50%);width:min(90vw,340px);
+display:flex;justify-content:center;align-items:flex-start;gap:12px;pointer-events:none}
+.backgroundPolaroid{width:clamp(72px,23vw,130px);padding:5px 5px 18px;box-sizing:border-box;
+background:#f7f4ec;border:1px solid #ded9ce;box-shadow:0 4px 12px rgba(0,0,0,.6);opacity:.7}
+.backgroundPolaroid:first-child{transform:rotate(-4deg)}
+.backgroundPolaroid:last-child{transform:rotate(4deg)}
+.backgroundPolaroid img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;image-rendering:auto}
+#bq{position:absolute;z-index:2;pointer-events:none;image-rendering:auto}
+#msg{position:absolute;z-index:4;top:calc(5vh + env(safe-area-inset-top,0px));left:0;right:0;text-align:center;color:var(--fg);
+font:clamp(9px,3vw,15px)/1.6 'Press Start 2P',monospace;text-shadow:none;transition:opacity .6s;padding:0 12px}
+#couplePolaroid{position:absolute;z-index:0;left:50%;top:23%;transform:translateX(-50%) rotate(-2deg);opacity:.5;
+width:clamp(128px,28vw,170px);padding:8px 8px 25px;box-sizing:border-box;background:#f7f4ec;
+border:1px solid #ded9ce;box-shadow:0 5px 16px rgba(0,0,0,.65);pointer-events:none}
+#couplePolaroid img{display:block;width:100%;height:auto}
+#musicControls{position:absolute;left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+display:flex;gap:8px;z-index:5}
+#musicControls button{border:1px solid rgba(255,255,255,.55);border-radius:999px;background:rgba(0,0,0,.8);color:#fff;
+font:8px/1 'Press Start 2P',monospace;padding:10px 12px;cursor:pointer}
+#musicControls button:active{transform:scale(.96)}
+#musicStatus{position:absolute;z-index:5;left:0;right:0;bottom:calc(48px + env(safe-area-inset-bottom,0px));
+text-align:center;color:#fff;font:10px/1.4 Arial,sans-serif;text-shadow:0 1px 3px #000;pointer-events:none}
+#letterTrigger{position:absolute;z-index:6;right:12px;bottom:calc(54px + env(safe-area-inset-bottom,0px));
+width:92px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer}
+.envelope{position:relative;display:block;width:74px;height:48px;margin:0 auto 5px;
+background:#ffb6d0;border:2px solid #ffe2ed;border-radius:4px;box-shadow:0 3px 10px rgba(0,0,0,.55)}
+.envelope:before{content:"";position:absolute;inset:-1px 0 auto;height:29px;
+background:#ffc9dc;clip-path:polygon(0 0,50% 100%,100% 0);z-index:1}
+.envelope:after{content:"";position:absolute;inset:0;
+background:#ff78a9;clip-path:polygon(0 32%,50% 72%,100% 32%,100% 100%,0 100%);z-index:2}
+.envelope-ribbon{position:absolute;z-index:3;left:calc(50% - 5px);top:0;width:10px;height:100%;
+background:#e83e7b;border-left:1px solid #ffd0e1;border-right:1px solid #ffd0e1}
+.envelope-bow{position:absolute;z-index:4;left:50%;top:-9px;width:10px;height:10px;
+border-radius:50%;transform:translateX(-50%);background:#d92b6d;border:2px solid #ffe2ed}
+.envelope-bow:before,.envelope-bow:after{content:"";position:absolute;top:-2px;width:13px;height:9px;
+border:3px solid #f04f88;border-radius:12px 12px 3px 12px}
+.envelope-bow:before{right:7px;transform:rotate(22deg)}
+.envelope-bow:after{left:7px;transform:scaleX(-1) rotate(22deg)}
+.openMe{display:block;font:8px/1.4 'Press Start 2P',monospace;text-shadow:1px 1px 2px #000}
+#letterDialog{width:min(440px,calc(100vw - 36px));max-height:78vh;overflow:auto;box-sizing:border-box;
+padding:24px;border:3px solid #f08bb4;border-radius:18px;background:#fff7fb;color:#48162d;
+box-shadow:0 12px 45px rgba(0,0,0,.65);font:16px/1.65 Arial,sans-serif}
+#letterDialog::backdrop{background:rgba(0,0,0,.82)}
+#letterDialog h2{margin:0 0 12px;color:#c52e6a;font:16px/1.5 'Press Start 2P',monospace}
+#letterDialog p{margin:0 0 18px}
+#closeLetter{display:block;margin-left:auto;border:0;border-radius:999px;background:#e83e7b;
+color:#fff;padding:10px 16px;font-weight:bold;cursor:pointer}
+</style></head><body>
+<canvas id="c"></canvas><div id="msg"></div>
+<div id="photoStrip" aria-label="Two Polaroid photos">
+<div class="backgroundPolaroid"><img src="me-n-tamtam.jpg" alt="Photo of us"></div>
+<div class="backgroundPolaroid"><img src="tamtam-n-me.jpg" alt="Another photo of us"></div>
+</div>
+<div id="couplePolaroid"><img src="couple.gif" alt="A couple sharing a hug"></div>
+<button id="letterTrigger" type="button" aria-haspopup="dialog" aria-controls="letterDialog">
+<span class="envelope" aria-hidden="true"><span class="envelope-ribbon"></span><span class="envelope-bow"></span></span>
+<span class="openMe">OPEN ME</span>
+</button>
+<dialog id="letterDialog" aria-labelledby="letterHeading">
+<h2 id="letterHeading">Happy Motmot, tamtam!</h2>
+<p>Happy motmot tamtam! I know I may not always give you the things that you wanted and I have been inconsistent on some things. But I know one thing, Ill always find a way to suprise you!! I know we cant celebrate monthsary that much because of our sched but its okay because we get to see eachother at the end of the day and thats a gift alone na! I love youu so muchh babyy and Happy MOTMOTTTT OPAOOO!! See you laterr</p>
+<button id="closeLetter" type="button">Close</button>
+</dialog>
+<audio id="bgMusic" src="music.mp3" loop preload="auto" autoplay></audio>
+<div id="musicControls" aria-label="Music controls">
+<button id="startMusic" type="button" disabled>START</button>
+<button id="stopMusic" type="button" disabled>STOP</button>
+</div>
+<div id="musicStatus" role="status" aria-live="polite">Add a licensed music.mp3 file to enable music.</div>
+<script>
+const W=180,H=280,G=262,CX=54;
+const cv=document.getElementById('c'),x=cv.getContext('2d');cv.width=W;cv.height=H;x.imageSmoothingEnabled=false;
+function fit(){const k=Math.min(innerWidth/W,innerHeight/H),s=k>=1?Math.floor(k):k;cv.style.width=W*s+'px';cv.style.height=H*s+'px'}
+fit();addEventListener('resize',fit);
+const lerp=(a,b,t)=>a+(b-a)*t,cl=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)),R=Math.random,rn=(a,b)=>a+R()*(b-a);
+const px=(a,b,w,h,c)=>{x.fillStyle=c;x.fillRect(Math.round(a),Math.round(b),w,h)};
+const line=(x0,y0,x1,y1,c)=>{const n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0));for(let i=0;i<=n;i++)px(lerp(x0,x1,i/n),lerp(y0,y1,i/n),1,1,c)};
+// ---------- background (pre-rendered) ----------
+const stars=[];
+// ---------- character ----------
+const S='#d9a074',Sd='#b9814f',K='#17171c',HR='#2a1c17';
+function man(cx,gy,o){
+ const yb=gy-o.hop-o.bob,yh=yb-17,l=o.l,r=o.r;
+ px(cx-5,gy-6-l,3,6,'#2f3550');px(cx+2,gy-6-r,3,6,'#2f3550');
+ px(cx-6,gy-2-l,4,2,'#111');px(cx+2,gy-2-r,4,2,'#111');
+ px(cx-7,yb-17,14,11,K);
+ px(cx-10,yb-16+o.a,3,6,K);px(cx-10,yb-10+o.a,3,2,S);
+ if(o.ext>=0){px(cx+7,yb-15,4+o.ext,3,K);px(cx+11+o.ext,yb-15,3,3,S)}
+ else{px(cx+7,yb-16-o.a,3,6,K);px(cx+7,yb-10-o.a,3,2,S)}
+ px(cx-2,yh,4,1,S);px(cx-2,yh+1,1,1,'#c9ced6');px(cx+1,yh+1,1,1,'#c9ced6');
+ px(cx-10,yh-17,20,17,S);px(cx-11,yh-10,1,4,Sd);px(cx+10,yh-10,1,4,Sd);
+ px(cx-12,yh-21,24,7,HR);px(cx-12,yh-15,3,9,HR);px(cx+9,yh-15,3,8,HR);
+ px(cx-10,yh-14,12,2,HR);px(cx-10,yh-12,6,2,HR);px(cx+2,yh-14,8,2,HR);
+ [[-8,-22,4],[1,-22,5],[7,-21,3],[-13,-18,1]].forEach(p=>px(cx+p[0],yh+p[1],p[2],1,HR));
+ px(cx-3,yh-19,3,1,'#4a352c');px(cx+3,yh-18,2,1,'#4a352c');
+ if(o.blink){px(cx-6,yh-7,3,1,HR);px(cx+3,yh-7,3,1,HR)}
+ else{px(cx-6,yh-8,3,3,'#1a1210');px(cx+3,yh-8,3,3,'#1a1210');px(cx-5,yh-8,1,1,'#fff');px(cx+4,yh-8,1,1,'#fff')}
+ px(cx-7,yh-10,4,1,HR);px(cx+3,yh-10,4,1,HR);px(cx,yh-5,2,1,Sd);
+ const M='#8c3b3b';px(cx-3,yh-3,1,1,M);px(cx-2,yh-2,5,1,M);px(cx+3,yh-3,1,1,M);
+ px(cx-8,yh-4,3,1,'#e8907f');px(cx+5,yh-4,3,1,'#e8907f');px(cx+6,yh-6,1,1,'#5a3a28');
+}
+// ---------- realistic ASCII bouquet ----------
+const BW=96,BH=120,C=100,RW=80,cw=BW/C,chh=BH/RW,RAMP=' .,:;ox%#@',TAU=6.2832;
+const bq=document.createElement('canvas');bq.id='bq';document.body.appendChild(bq);const q=bq.getContext('2d');let SC=1;
+const hs=(a,b)=>{const v=Math.sin(a*127.1+b*311.7)*43758.5;return v-Math.floor(v)},ang=(dx,dy)=>Math.atan2(dy,dx);
+const sm=(a,b,v)=>{const t=cl((v-a)/(b-a));return t*t*(3-2*t)},mx=(a,b,t)=>a.map((v,i)=>v+(b[i]-v)*t),fr=v=>v-Math.floor(v),LA=2.36;
+const SH={
+lily:(dx,dy,R,n)=>{const r=Math.hypot(dx,dy),a=ang(dx,dy),u=r/R;
+ const sa=Math.round((a-.3)/(TAU/6)),d=a-.3-sa*TAU/6,rd=r*Math.abs(d);
+ if(u<.44&&u>.08&&rd<.5)return{c:[225,230,175],l:.85};
+ if(u>.36&&u<.46&&rd<1.3)return{c:[150,65,28],l:.55};
+ const k=Math.round(a/(TAU/6)),th=a-k*TAU/6,odd=((k%2)+2)%2,len=odd?.86:1;
+ const hw=(TAU/12)*(odd?.82:1)*Math.pow(Math.sin(Math.PI*Math.min(1,u/len)),.55)*(1+.18*(1-u));
+ if(u>len||Math.abs(th)>hw)return null;const v=th/hw,av=Math.abs(v);
+ let l=.5+.3*Math.cos(k*TAU/6+LA)*u+.28*(1-Math.pow(av,1.6))+.05*Math.sin(v*14+u*3);if(av<.05)l-=.14;if(av>.88)l+=.1;
+ let c=mx([150,35,25],[255,190,150],sm(.2,.8,u));
+ if(av<.45&&u<.75)c=mx(c,[210,55,35],.5*(1-av/.45));c=mx(c,[255,245,220],sm(.8,1,av)*.6);
+ if(u<.18)c=mx([195,205,90],c,u/.18);
+ if(n>.88&&u>.15&&u<.6&&av<.65)c=[110,15,55];
+ return{c,l:cl(l)}},
+daf:(dx,dy,R,n)=>{const r=Math.hypot(dx,dy),a=ang(dx,dy),u=r/R,cr=.36*(1+.09*Math.cos(12*a));
+ if(u<cr){const e=u/cr;if(e>.8)return{c:mx([255,185,50],[255,215,110],(e-.8)/.2),l:.9};
+  return{c:mx([110,50,5],[235,135,20],sm(0,.8,e)),l:cl(.25+.6*sm(0,.8,e)*(.5+.35*Math.cos(a+LA)*e)+.1*Math.sin(a*12))}}
+ const k=Math.round(a/(TAU/6)),th=a-k*TAU/6,hw=(TAU/12)*1.12*Math.pow(Math.sin(Math.PI*Math.min(1,u)),.4);
+ if(u>1||Math.abs(th)>hw)return null;const v=th/hw;
+ let l=.55+.3*Math.cos(k*TAU/6+LA)*u+.2*(1-v*v)+.05*Math.sin(v*22);if(Math.abs(v)<.04)l-=.1;
+ return{c:mx([240,190,15],[255,238,120],sm(.3,.95,u)),l:cl(l)}},
+tul:(dx,dy,R,n)=>{const X=dx/R,Y=dy/R,hb=.78*Math.sqrt(Math.max(0,1-((Y-.12)/.88)**2));let ok=false;
+ if(Y>-.42)ok=Math.abs(X)<hb;else if(Y>-1)[-.5,0,.5].forEach(t=>{if(Math.abs(X-t)<.3*(Y+1)/.58*(t==0?1.25:1))ok=true});
+ if(!ok)return null;let l=.5+.4*Math.cos(Math.asin(cl(X/.8,-.98,.98))+.9);
+ if(Math.abs(Math.abs(X)-.27)<.025)l-=.2;l+=.04*Math.sin(X*30);
+ return{c:mx([255,105,70],[190,25,20],sm(-1,.7,Y)),l:cl(l)}},
+carn:(dx,dy,R,n)=>{const r=Math.hypot(dx,dy),a=ang(dx,dy),u=r/R;
+ const B=.82+.1*Math.cos(14*a+2*Math.sin(5*a))+.08*Math.sin(23*a);
+ if(u>B*(.93+.07*hs(Math.floor(a*20),1)))return null;
+ let l=.3+.45*Math.pow(Math.sin(Math.PI*fr(u*4.2+.15*Math.sin(a*7))),.6)+.15*Math.sin(a*13+u*5)+.12*u-.25*sm(.3,0,u);l=cl(l);
+ const c=mx([60,135,195],[170,222,248],l);return{c:u>.88?mx(c,[225,245,255],.5):c,l}},
+rose:(dx,dy,R,n)=>{const r=Math.hypot(dx,dy),a=ang(dx,dy);if(r>R*(1+.05*Math.cos(5*a)))return null;const rr=r/R;
+ if(rr<.2){const s=(Math.sin(2*a+rr*22)+1)/2;return{c:mx([120,25,60],[210,80,125],s),l:.2+.3*s}}
+ const L=Math.floor(rr/.14),u=fr((rr+.045*Math.cos(5*a+L*1.9)+.02*Math.sin(3*a-L))/.14);
+ let l=.25+.6*sm(0,.8,u)+.08*Math.cos(a+LA);if(u>.85)l+=.2;if(u<.12)l-=.2;
+ return{c:mx([180,35,25],[255,155,125],cl(.25+.5*u+.25*rr)),l:cl(l)}}};
+const BL=[['lily',46,30,20,8.0],['daf',76,34,13,9.0],['daf',18,30,12,9.4],['lily',22,56,17,8.6],['tul',78,62,13,8.4],['tul',36,46,13,9.2],['carn',68,78,13,9.6],['carn',28,80,12,9.8],['rose',60,50,11,10.6],['rose',48,66,15,10.2]];
+const LV=[[26,94,16,-.55],[70,94,16,.55],[14,84,14,-.9],[82,84,14,.9],[36,88,13,-.3],[60,88,13,.3]];
+const BUDC={lily:[215,60,125],daf:[200,195,60],tul:[200,30,60],carn:[100,170,215],rose:[235,120,160]};
+const segD=(X,Y,x0,y0,x1,y1)=>{const vx=x1-x0,vy=y1-y0,t=cl(((X-x0)*vx+(Y-y0)*vy)/(vx*vx+vy*vy));return Math.hypot(X-x0-t*vx,Y-y0-t*vy)};
+const PATH=BL.map(b=>{const P=[],cx=48+(b[1]-48)*.25,cy=104+(b[2]-104)*.65;for(let i=0;i<=24;i++){const u=i/24,v=1-u;P.push([v*v*48+2*v*u*cx+u*u*b[1],v*v*104+2*v*u*cy+u*u*b[2]])}return P});
+function stemFn(X,Y,n){let o=null;
+ PATH.forEach(P=>{let d=9;for(const p of P){const e=Math.hypot(X-p[0],Y-p[1]);if(e<d)d=e}if(d<1.5)o={c:[75,150,75],l:.35+.5*(1-d/1.5)}});
+ const hw=3+(BH-Y)*.4;
+ if(Y>96&&Math.abs(X-48)<hw){const e=(X-48)/hw;o=(Y>106&&Y<112)?{c:[235,90,150],l:cl(.45+.45*Math.cos(e*2.2+.8))}:{c:[70,150,70],l:.3+.5*(.5+.5*Math.cos((X-48)*1.2+n))}}
+ return o}
+function leafFn(X,Y,n){let o=null;if(Y>98)return o;
+ LV.forEach(L=>{const dx=X-L[0],dy=Y-L[1],co=Math.cos(L[3]),si=Math.sin(L[3]),u=(dx*co+dy*si)/L[2],v=(-dx*si+dy*co)/(L[2]*.28),up=(u+1)/2;
+  if(up>0&&up<1&&Math.abs(v)<Math.pow(Math.sin(Math.PI*up),.7))o={c:mx([30,95,45],[120,190,95],up),l:cl(.3+.4*(1-Math.abs(v))+(Math.abs(v)<.06?.25:0)+.07*Math.sin(up*40+v*3))}});
+ return o}
+function mk(w,h,ox,oy,fn){const c=document.createElement('canvas');c.width=Math.ceil(w*SC);c.height=Math.ceil(h*SC);const g=c.getContext('2d');g.scale(SC,SC);g.translate(-ox,-oy);
+ g.font=(chh*1.1)+'px monospace';g.textAlign='center';g.textBaseline='middle';
+ for(let row=Math.floor(oy/chh);row<Math.ceil((oy+h)/chh);row++)for(let col=Math.floor(ox/cw);col<Math.ceil((ox+w)/cw);col++){
+  const X=(col+.5)*cw,Y=(row+.5)*chh,o=fn(X,Y,hs(col,row));if(!o)continue;
+  const f=.45+.65*o.l,rgb=o.c.map(v=>Math.round(cl(v*f,0,255)));
+  g.fillStyle='rgb('+rgb.map(v=>v*.28|0)+')';g.fillRect(col*cw,row*chh,cw+.05,chh+.05);
+  g.fillStyle='rgb('+rgb+')';g.fillText(RAMP[cl(Math.round(o.l*9),1,9)],X,Y)}
+ return c}
+let EL=[];
+function build(){EL=[{k:'s',c:mk(BW,BH,0,0,stemFn)},{k:'l',c:mk(BW,BH,0,0,leafFn)}];
+ BL.forEach((b,i)=>{const R=b[3],m=R*1.3,bm=R*.6;EL.push({k:'f',b,m,bm,i,c:mk(2*m,2*m,b[1]-m,b[2]-m,(X,Y,n)=>SH[b[0]](X-b[1],Y-b[2],R,n)),
+  bd:mk(2*bm,2*bm,b[1]-bm,b[2]-bm,(X,Y,n)=>{const dx=X-b[1],dy=Y-b[2],w=.26*R;if((dx/w)**2+((dy+.08*R)/(.48*R))**2>1)return null;
+   if(dy>.3*R)return{c:[60,140,70],l:.5};return{c:BUDC[b[0]],l:cl(.4+.45*Math.cos(Math.asin(cl(dx/w,-.98,.98))+.9)-.2*sm(-.4,.3,dy/R))}})})})}
+function fit2(){const r=cv.getBoundingClientRect(),br=document.body.getBoundingClientRect(),d=devicePixelRatio||1;
+ bq.style.left=r.left-br.left+'px';bq.style.top=r.top-br.top+'px';bq.style.width=r.width+'px';bq.style.height=r.height+'px';
+ bq.width=Math.round(r.width*d);bq.height=Math.round(r.height*d);SC=bq.width/W;build()}
+fit2();addEventListener('resize',fit2);
+const SCR=document.createElement('canvas'),sg=SCR.getContext('2d'),se=v=>v*v*v*(v*(v*6-15)+10);
+function soft(img,x0,y0,w,h,mk_,al){SCR.width=img.width;SCR.height=img.height;sg.globalCompositeOperation='source-over';sg.drawImage(img,0,0);
+ sg.globalCompositeOperation='destination-in';sg.fillStyle=mk_(sg);sg.fillRect(0,0,img.width,img.height);
+ q.globalAlpha=al;q.drawImage(SCR,0,0,img.width,img.height,x0,y0,w,h);q.globalAlpha=1}
+function rad(cx,cy,r,k){return g=>{const G=g.createRadialGradient(cx*k,cy*k,Math.max(0,r*.45*k),cx*k,cy*k,Math.max(1,r*k));G.addColorStop(0,'#fff');G.addColorStop(1,'rgba(255,255,255,0)');return G}}
+function drawBq(t,bx,by){
+ q.setTransform(1,0,0,1,0,0);q.clearRect(0,0,bq.width,bq.height);q.setTransform(SC,0,0,SC,bx*SC,by*SC);
+ EL.forEach(e=>{
+  if(e.k=='s'){const p=se(cl((t-5.2)/1.9));if(p<=0)return;const yf=lerp(BH,-20,p);
+   soft(e.c,0,0,BW,BH,g=>{const G=g.createLinearGradient(0,yf*SC,0,(yf+20)*SC);G.addColorStop(0,'rgba(255,255,255,0)');G.addColorStop(1,'#fff');return G},1);return}
+  if(e.k=='l'){const p=se(cl((t-6.5)/1.6));if(p<=0)return;soft(e.c,0,0,BW,BH,rad(48,104,p*90,SC),1);return}
+  const b=e.b,bp=se(cl((t-(7.2+e.i*.1))/.9));
+  if(bp>0&&t<b[4]+1.3){q.save();q.translate(b[1],b[2]);q.scale(bp,bp);q.globalAlpha=bp;q.drawImage(e.bd,-e.bm,-e.bm,2*e.bm,2*e.bm);q.restore();q.globalAlpha=1}
+  const p=cl((t-b[4])/2.4);if(p<=0)return;const ea=se(p),r=ea*b[3]*1.55,s=.72+.28*ea;
+  q.save();q.translate(b[1],b[2]);q.scale(s,s);q.translate(-b[1],-b[2]);
+  if(p<1)soft(e.c,b[1]-e.m,b[2]-e.m,2*e.m,2*e.m,rad(e.m,e.m,r,SC),cl(p*3.2));else q.drawImage(e.c,b[1]-e.m,b[2]-e.m,2*e.m,2*e.m);
+  q.restore()});
+ q.setTransform(SC,0,0,SC,0,0)}
+// ---------- fireworks & hearts ----------
+const pal=['#ff9d5c','#ffd54a','#7fe0ff','#ffb38a','#8fffa8','#fff'];
+let rockets=[],parts=[],hearts=[],nextFw=0,nextHt=0;
+function fw(dt,on,T){
+ if(on&&T>nextFw&&rockets.length<3){nextFw=T+rn(.8,1.3);rockets.push({x:rn(20,160),y:G-30,vy:-rn(110,150),ty:rn(35,120),c:pal[Math.floor(R()*pal.length)]})}
+ rockets=rockets.filter(r=>{r.y+=r.vy*dt;if(r.y<=r.ty){const n=28,sp=rn(26,46);for(let i=0;i<n;i++){const a=i/n*6.283,s=sp*rn(.75,1.05);parts.push({x:r.x,y:r.y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:1,c:i%4==0?'#fff':r.c})}return false}
+  px(r.x,r.y,1,2,'#fff');px(r.x,r.y+3,1,1,r.c);return true});
+ if(parts.length>360)parts.splice(0,parts.length-360);
+ parts=parts.filter(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=38*dt;p.vx*=.985;p.l-=dt*.55;if(p.l<=0)return false;x.globalAlpha=Math.min(1,p.l*1.6);px(p.x,p.y,2,2,p.c);x.globalAlpha=1;return true})}
+function hrt(dt,on,T){
+ if(on&&T>nextHt){nextHt=T+.7;hearts.push({x:rn(40,140),y:G-10,l:1})}
+ hearts=hearts.filter(h=>{h.y-=14*dt;h.l-=dt*.3;if(h.l<=0)return false;x.globalAlpha=h.l;const c='#ff9d5c',X=Math.round(h.x+Math.sin(h.y/9)*3),Y=Math.round(h.y);
+  px(X,Y,2,1,c);px(X+3,Y,2,1,c);px(X,Y+1,5,1,c);px(X+1,Y+2,3,1,c);px(X+2,Y+3,1,1,c);x.globalAlpha=1;return true})}
+// ---------- timeline ----------
+const msg=document.getElementById('msg');let phase=-1;
+const TXT=['Happy Motmot, paopaoooo','this bouquet is for you','Happy Motmot, paopaoooo \u2665'];
+function setPhase(p){if(p==phase)return;phase=p;msg.style.opacity=0;setTimeout(()=>{msg.textContent=TXT[p];msg.style.opacity=1},300)}
+let T=0,last=0;
+function frame(ms){
+ const dt=Math.min(.05,(ms-last)/1000||.016);last=ms;T+=dt;
+ x.clearRect(0,0,W,H);
+ stars.forEach(s=>{x.globalAlpha=.4+.6*Math.abs(Math.sin(T*1.5+s[2]));px(s[0],s[1],1,1,'#fff');x.globalAlpha=1});
+ fw(dt,T>13.4,T);
+ const wp=cl((T-.6)/3.6),e=wp*wp*(3-2*wp),cx=-16+(CX+16)*e,walking=wp>0&&wp<1,sn=Math.sin(T*9);
+ const give=cl((T-4.3)/.7),gv=give*give*(3-2*give),ext=give>0?Math.round(gv*8):-1;
+ const hp=T-5.0,hop=hp>0&&hp<.4?Math.round(3*Math.sin(hp/.4*Math.PI)):0;
+ const o={hop,l:walking&&sn>.3?2:0,r:walking&&sn<-.3?2:0,bob:walking?(Math.abs(sn)>.6?0:1):Math.round((Math.sin(T*3)+1)/2),
+  a:walking?Math.round(sn*1.5):0,ext,blink:T%3.2<.12};
+ man(cx,G,o);
+ if(T>4.5){const ap=cl((T-4.5)/.7),ae=1-Math.pow(1-ap,3),yb=G-o.hop-o.bob,hx=cx+12+Math.max(ext,0),hy=yb-14;
+  drawBq(T,hx-38,hy-104+(1-ae)*40+Math.round(Math.sin(T*2.5)));q.fillStyle=S;q.fillRect(hx-2,hy-1,5,3)}
+ hrt(dt,T>13.4,T);
+ setPhase(T<4.3?0:T<13.4?1:2);
+ requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script>
+<script>
+const bgMusic=document.getElementById('bgMusic');
+bgMusic.volume=0.35;
+const musicStatus=document.getElementById('musicStatus');
+const startMusic=document.getElementById('startMusic');
+const stopMusic=document.getElementById('stopMusic');
+let hasMusic=false;
+bgMusic.addEventListener('canplay',()=>{
+ hasMusic=true;
+ startMusic.disabled=false;
+ stopMusic.disabled=false;
+ musicStatus.textContent='';
+});
+bgMusic.addEventListener('error',()=>{
+ hasMusic=false;
+ startMusic.disabled=true;
+ stopMusic.disabled=true;
+ musicStatus.textContent='Add a licensed music.mp3 file to enable music.';
+});
+const letterDialog=document.getElementById('letterDialog');
+document.getElementById('letterTrigger').addEventListener('click',()=>letterDialog.showModal());
+document.getElementById('closeLetter').addEventListener('click',()=>letterDialog.close());
+letterDialog.addEventListener('click',event=>{
+ if(event.target===letterDialog)letterDialog.close();
+});
+bgMusic.play().then(()=>{
+ musicStatus.textContent='';
+}).catch(error=>{
+ musicStatus.textContent=hasMusic&&error.name==='NotAllowedError'
+  ?'Autoplay was blocked by the browser. Press START to play.'
+  :hasMusic?'Music could not start. Press START to try again.'
+  :'Add a licensed music.mp3 file to enable music.';
+});
+startMusic.addEventListener('click',()=>{
+ bgMusic.play().then(()=>{musicStatus.textContent='';}).catch(error=>{
+  musicStatus.textContent='Music could not start: '+error.message;
+ });
+});
+stopMusic.addEventListener('click',()=>{
+ bgMusic.pause();
+ bgMusic.currentTime=0;
+ musicStatus.textContent='Music stopped';
+});
+</script>
+</body></html>
